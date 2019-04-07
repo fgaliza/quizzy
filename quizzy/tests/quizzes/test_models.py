@@ -1,9 +1,8 @@
 import pytest
 from django.db import IntegrityError
 
-from apps.quizzes.models import Choice, Question
-
 from .factories import QuestionFactory
+from apps.quizzes.models import Choice, Question
 
 pytestmark = pytest.mark.django_db
 
