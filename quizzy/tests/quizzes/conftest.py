@@ -5,6 +5,14 @@ import pytest
 def question_payload():
     return {
         'text': 'Is the cake a lie?',
+        'choices': [
+            {
+                'text': 'Yes',
+            },
+            {
+                'text': 'No',
+            },
+        ]
     }
 
 
