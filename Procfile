@@ -1,0 +1,1 @@
+web: gunicorn --chdir=quizzy quizzy.wsgi:application
