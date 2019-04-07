@@ -1,0 +1,35 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+djangorestframework = "*"
+django = "*"
+drf-nested-routers = "*"
+prettyconf = "*"
+coreapi = "*"
+pygments = "*"
+markdown = "*"
+gunicorn = "*"
+whitenoise = "*"
+django-extensions = "*"
+
+[dev-packages]
+coverage = "*"
+factory-boy = "*"
+ipdb = "*"
+pre-commit = "*"
+pytest = "*"
+pytest-cache = "*"
+pytest-cov = "*"
+pytest-django = "*"
+pytest-timeout = "*"
+pytest-xdist = "*"
+pytest-deadfixtures = "*"
+pytest-freezegun = "*"
+"flake8" = "*"
+django-extensions = "*"
+
+[requires]
+python_version = "3.7.2"
