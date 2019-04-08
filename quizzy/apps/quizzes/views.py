@@ -7,7 +7,9 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
 from .models import Choice, Question, Quiz
-from .serializers import ChoiceSerializer, QuestionSerializer, QuizSerializer
+from .serializers import AnswerSerializer, ChoiceSerializer, QuestionSerializer, QuizSerializer
+from apps.users.models import AppUser
+from apps.users.serializers import AppUserSerializer
 from apps.utils import url_decrypt
 
 
@@ -75,7 +77,11 @@ class QuizViewSet(
     viewsets.GenericViewSet
 ):
     queryset = Quiz.objects.all().order_by('-text')
-    serializer_class = QuizSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AnswerSerializer
+        return QuizSerializer
 
     def list(self, request, *args, **kwargs):
         random_questions = Question.objects.all().order_by('?')[:settings.QUESTIONS_PER_QUIZ]
@@ -112,3 +118,53 @@ class QuizViewSet(
 
         serializer = QuizSerializer(quiz)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        data = json.loads(request.data)
+        username = data.get('user')
+
+        if not username:
+            return Response(
+                'No user sent',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = AppUser.objects.get(name=username)
+        except ObjectDoesNotExist:
+            user_serializer = AppUserSerializer(data={'name': username})
+            if user_serializer.is_valid():
+                user = user_serializer.save()
+            else:
+                return Response(
+                    'Invalid username',
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        answers = data.get('answers')
+
+        if not answers:
+            return Response(
+                'No answers sent',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        for answer in answers:
+            question = Question.objects.get(id=answer['question'])
+            choice = Choice.objects.get(text=answer['choice'])
+            answer_data = {
+                'question': question.__dict__,
+                'choice': choice.__dict__,
+            }
+            serializer = AnswerSerializer(data=answer_data)
+
+            if not serializer.is_valid():
+                return Response(
+                    'Invalid answer payload',
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            serializer.save(user=user)
+
+# This would return a link for this quiz answered by the user
+# Detail route would be a user answering an existing quiz answered by other user.
+# The Response for the detail route would be the statistics of the questions

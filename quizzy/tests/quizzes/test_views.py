@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -172,3 +174,13 @@ def test_get_specific_quiz(client):
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data['questions']) == 1
     assert response.data['questions'][0]['text'] == question.text
+
+
+def test_answer_random_quiz(client, answers_payload):
+    question = QuestionFactory(text='Do you even lift?')
+    ChoiceFactory(question=question, text='Yes')
+    ChoiceFactory(question=question, text='No')
+    url = reverse('quizzes:quiz-list')
+    response = client.post(url, json.dumps(answers_payload), format='json')
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data['quiz_url'] == 'lalala'
