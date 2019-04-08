@@ -1,6 +1,6 @@
 from rest_framework_nested import routers
 
-from .views import QuestionViewSet, ChoiceViewSet, QuizViewSet
+from .views import ChoiceViewSet, QuestionViewSet, QuizViewSet
 
 app_name = "quizzes"
 

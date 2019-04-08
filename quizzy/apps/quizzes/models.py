@@ -22,3 +22,12 @@ class Choice(models.Model):
 class Quiz(models.Model):
     user = models.ForeignKey(AppUser, on_delete=models.CASCADE, db_index=True)
     questions = models.ManyToManyField(Question, related_name='quiz')
+
+
+class Answer(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='answer', db_index=True)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answer')
+    choice = models.OneToOneField(Choice, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('quiz', 'question', 'choice')
