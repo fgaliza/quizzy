@@ -1,3 +1,3 @@
 # Quizzy
 
-Study project for Python/Django
+Study project for Python/Django.
