@@ -2,9 +2,8 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from apps.utils import url_encrypt
-
 from .factories import ChoiceFactory, QuestionFactory, QuizFactory
+from apps.utils import url_encrypt
 
 pytestmark = pytest.mark.django_db
 
