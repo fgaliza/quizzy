@@ -1,6 +1,6 @@
 import pytest
 
-from apps.quizzes.serializers import ChoiceSerializer, QuestionSerializer
+from apps.quizzes.serializers import ChoiceSerializer, QuestionSerializer, QuizSerializer
 
 pytestmark = pytest.mark.django_db
 
@@ -26,4 +26,14 @@ def test_choice_serializer(choice_payload):
 def test_choice_serializer_without_required_fields(choice_payload):
     del choice_payload['text']
     serializer = ChoiceSerializer(data=choice_payload)
+    assert serializer.is_valid() is False
+
+
+def test_quiz_serializer(quiz_payload):
+    serializer = QuizSerializer(data=quiz_payload)
+    assert serializer.is_valid() is True
+
+
+def test_quiz_serializer_without_required_fields(quiz_payload):
+    serializer = QuizSerializer(data=[])
     assert serializer.is_valid() is False
