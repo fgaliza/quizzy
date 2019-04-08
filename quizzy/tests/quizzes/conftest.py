@@ -21,3 +21,10 @@ def choice_payload():
     return {
         'text': 'Yes',
     }
+
+
+@pytest.fixture
+def quiz_payload(question_payload):
+    return {
+        'questions': [question_payload]
+    }

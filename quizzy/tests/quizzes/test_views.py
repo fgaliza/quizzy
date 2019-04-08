@@ -2,7 +2,9 @@ import pytest
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from .factories import ChoiceFactory, QuestionFactory
+from apps.utils import url_encrypt
+
+from .factories import ChoiceFactory, QuestionFactory, QuizFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -144,3 +146,30 @@ def test_delete_choice(client):
     url = reverse('quizzes:choices-detail', [question.id, choice.id])
     response = client.delete(url)
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+# Quiz
+
+
+def test_get_random_quiz(client):
+    url = reverse('quizzes:quiz-list')
+    QuestionFactory(text='Do you even lift?')
+    QuestionFactory(text='Is the cake a lie?')
+    response = client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data['questions']) == 2
+
+
+def test_get_specific_quiz(client):
+    question = QuestionFactory(text='Do you even lift?')
+    quiz = QuizFactory(questions=[question])
+    url_data = url_encrypt(
+        quiz_id=quiz.id,
+    )
+
+    url = reverse('quizzes:quiz-detail', [url_data])
+
+    response = client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.data['questions']) == 1
+    assert response.data['questions'][0]['text'] == question.text

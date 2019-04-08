@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Choice, Question
+from .models import Choice, Question, Quiz
 
 
 class ChoiceSerializer(serializers.Serializer):
@@ -21,3 +21,11 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ('text', 'choices')
+
+
+class QuizSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Quiz
+        fields = ('questions',)

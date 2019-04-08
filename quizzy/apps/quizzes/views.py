@@ -1,9 +1,14 @@
+import binascii
+import json
+
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
-from .models import Choice, Question
-from .serializers import ChoiceSerializer, QuestionSerializer
+from .models import Choice, Question, Quiz
+from .serializers import ChoiceSerializer, QuestionSerializer, QuizSerializer
+from apps.utils import url_decrypt
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -61,3 +66,49 @@ class ChoiceViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
+
+
+class QuizViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = Quiz.objects.all().order_by('-text')
+    serializer_class = QuizSerializer
+
+    def list(self, request, *args, **kwargs):
+        random_questions = Question.objects.all().order_by('?')[:settings.QUESTIONS_PER_QUIZ]
+        data = {
+            'questions': random_questions,
+        }
+        serializer = QuizSerializer(data)
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            data = json.loads(url_decrypt(kwargs['pk']))
+        except (binascii.Error, ValueError):
+            return Response(
+                'Quiz does not exist',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        quiz_id = data.get('quiz_id')
+
+        if not quiz_id:
+            return Response(
+                'Quiz does not exist',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            quiz = Quiz.objects.get(id=quiz_id)
+        except ObjectDoesNotExist:
+            return Response(
+                'Quiz does not exist',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = QuizSerializer(quiz)
+        return Response(serializer.data)
