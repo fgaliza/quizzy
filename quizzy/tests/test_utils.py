@@ -1,6 +1,8 @@
-from apps.utils import url_encrypt, url_decrypt
-import pytest
 import json
+
+import pytest
+
+from apps.utils import url_decrypt, url_encrypt
 
 
 @pytest.fixture
