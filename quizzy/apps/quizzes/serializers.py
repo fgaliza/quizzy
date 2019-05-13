@@ -3,16 +3,11 @@ from rest_framework import serializers
 from .models import Answer, Choice, Question, Quiz
 
 
-class ChoiceSerializer(serializers.Serializer):
-    text = serializers.CharField(max_length=200)
+class ChoiceSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        return Choice.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.text = validated_data.get('text', instance.text)
-        instance.save()
-        return instance
+    class Meta:
+        model = Choice
+        fields = ('text', 'question',)
 
 
 class QuestionSerializer(serializers.ModelSerializer):

@@ -19,6 +19,7 @@ def question_payload():
 @pytest.fixture
 def choice_payload():
     return {
+        'question': 1,
         'text': 'Yes',
     }
 
